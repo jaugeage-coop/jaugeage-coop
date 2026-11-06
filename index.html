@@ -26,7 +26,7 @@ textarea{min-height:130px;font-family:ui-monospace,monospace;font-size:13px}
 .lcard{border-top:1px solid var(--bd);padding:10px 0}.lcard h3{margin:0 0 4px;font-size:16px}.lcard table{width:100%;border-collapse:collapse}.lcard td{padding:3px 0;font-size:14px}.lcard td:last-child{text-align:right}.lcard td:first-child{color:var(--mut)}
 .stt{padding:10px 0}.stt span{color:var(--mut);display:block;font-size:13px}.stt b{font-size:26px;display:block}.stt small{color:var(--mut)}.str{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--bd)}.srec.out{opacity:.45}
 .ipv{width:100%;border-collapse:collapse;font-size:13px}.ipv td{padding:3px 4px;border-top:1px solid var(--bd)}
-.ctt{width:100%;border-collapse:collapse}.ctt td{padding:7px 0;border-top:1px solid var(--bd);font-size:14px;vertical-align:top}.ctt td:last-child{text-align:right;white-space:nowrap}.ctt small{display:block;color:var(--mut);font-size:11px;white-space:normal}.ctt .tt td{font-weight:700}
+.ctt{width:100%;border-collapse:collapse}.ctt td{padding:7px 0;border-top:1px solid var(--bd);font-size:14px;vertical-align:top}.ctt td:last-child{text-align:right;white-space:nowrap}.ctt small{display:block;color:var(--mut);font-size:11px;white-space:normal}.ctt .tt td{font-weight:700}.ctt .ctth td{color:var(--mut);font-size:12px;font-weight:600;white-space:normal;padding-left:10px}.ctt td+td{padding-left:10px}.ctt td:not(:first-child){text-align:right}.ctb{margin:0 0 10px;font-size:14px}.ctb div{padding:3px 0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tk b{font-size:18px;display:block}.tk small{color:var(--mut)}
 #prev{max-width:100%;border-radius:8px;margin-top:8px;display:none}
 .x{margin-left:auto;background:none;border:0;color:var(--er);font-size:20px}
@@ -57,7 +57,7 @@ textarea{min-height:130px;font-family:ui-monospace,monospace;font-size:13px}
   <form id="lf" autocomplete="on"><label>Identifiant</label><input id="em" type="text" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
   <label>Mot de passe</label><input id="pw" type="password" name="password" autocomplete="current-password">
   <label style="display:flex;gap:8px;align-items:center;margin:14px 0 0;font-size:15px;color:var(--fg)"><input type="checkbox" id="rem" checked style="width:auto">Se souvenir de moi</label>
-  <button class="btn" id="lb" type="submit">Se connecter</button></form><div id="lm" class="msg"></div></div>
+  <button class="btn" id="lb" type="submit">Se connecter</button></form><div id="lm" class="msg"></div><p style="text-align:center;color:var(--mut);font-size:12px;margin:14px 0 0">Romain.C · Version 4.2</p></div>
 </main></div>
 <div id="app" hidden>
 <header id="hdr" hidden><button id="back">← Accueil</button><span id="ptitle"></span></header>
@@ -74,6 +74,7 @@ textarea{min-height:130px;font-family:ui-monospace,monospace;font-size:13px}
   <button class="big" id="h7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></svg><span>Contrôle E/S<small>Gain ou perte sur une période</small></span></button>
   <button class="big" id="h2" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M4 12h16"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Administration<small>Barèmes, coefficients et utilisateurs</small></span></button>
  </div>
+ <p style="text-align:center;color:var(--mut);font-size:13px;margin:18px 0 0"><b>Romain.C</b><br><span style="font-size:12px">Version 4.2</span></p>
 </section>
 <section id="v0" hidden>
  <div class="card"><h2>Nouveau jaugeage</h2>
@@ -124,7 +125,7 @@ textarea{min-height:130px;font-family:ui-monospace,monospace;font-size:13px}
 <section id="v7" hidden>
  <div class="card"><h2>Contrôle entrées / sorties</h2>
   <div class="row"><div><label>Du</label><input id="ctfrom" type="datetime-local"></div><div><label>Au</label><input id="ctto" type="datetime-local"></div></div>
-  <button class="btn s" id="ctnow">Au = maintenant</button></div>
+  <button class="btn s" id="ctlast">Dernier contrôle (entre les 2 derniers imports)</button><button class="btn s" id="ctnow">Au = maintenant</button></div>
  <div class="card"><h2>Stock informatique</h2>
   <input id="cifile" type="file" accept=".csv,.txt,text/csv,text/plain"><div id="ciw" class="msg er"></div><div id="cires"></div></div>
  <div id="ctout"></div>
@@ -673,38 +674,61 @@ $('dsfile').onchange=function(e){var fl=e.target.files[0],inp=e.target;if(!fl)re
 var CS=[['FV','Feu vert','cuves 1, 2 et 3',['1','2','3']],['GL','Glacière','cuves 4 et 5',['4','5']]];
 function tdate(x){return new Date(x).getTime()}
 function rngDates(a){if(!a.length)return'';var mn=Math.min.apply(null,a),mx=Math.max.apply(null,a),fm=function(t){return new Date(t).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})};return mn===mx?fm(mn):fm(mn)+' → '+fm(mx)}
+function fm(t){return new Date(t).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}
+function sumE(site,a,b){var v=0;allStock().forEach(function(x){var d=tdate(x.delivered_at);if(x.station===site&&d>a&&d<=b)v+=Number(x.quantity)||0});return v}
+function sumS(site,a,b){var v=0;allDist().forEach(function(x){var d=tdate(x.distributed_at);if(x.site===site&&d>a&&d<=b)v+=Number(x.quantity)||0});return v}
 function infoAt(site,t){var best=-1;(L.irecs||[]).forEach(function(r){if(r.site!==site)return;var d=tdate(r.recorded_at);if(!isNaN(d)&&d<=t&&d>best)best=d});
- if(best<0)return null;var v=0;(L.irecs||[]).forEach(function(r){if(r.site===site&&tdate(r.recorded_at)===best)v+=Number(r.quantity)||0});return{v:v,d:rngDates([best])}}
-function ctSite(cs,from,to){var rd=allRecs().filter(function(r){return cs[3].indexOf(r.tank)>=0&&!isNaN(tdate(r.measured_at))}),o={miss:[],s0:0,s1:0,d0:[],d1:[]};
+ if(best<0)return null;var v=0,cu=[];(L.irecs||[]).forEach(function(r){if(r.site===site&&tdate(r.recorded_at)===best){v+=Number(r.quantity)||0;if(r.tank)cu.push([r.tank,Number(r.quantity)||0])}});return{v:v,t:best,cu:cu}}
+function ctSite(cs,from,to){var rd=allRecs().filter(function(r){return cs[3].indexOf(r.tank)>=0&&!isNaN(tdate(r.measured_at))}),o={miss:[],s0:0,s1:0,cu0:[],cu1:[]},ga=[],gb=[];
  function at(tk,t){var b=null;rd.forEach(function(r){if(r.tank===tk&&tdate(r.measured_at)<=t&&(!b||tdate(r.measured_at)>tdate(b.measured_at)))b=r});return b}
  cs[3].forEach(function(tk){var a=at(tk,from),b=at(tk,to);
-  if(a){o.s0+=Number(a.final_volume);o.d0.push(tdate(a.measured_at))}else o.miss.push('cuve '+tk+' au début');
-  if(b){o.s1+=Number(b.final_volume);o.d1.push(tdate(b.measured_at))}else o.miss.push('cuve '+tk+' à la fin')});
- o.ent=0;allStock().forEach(function(x){var d=tdate(x.delivered_at);if(x.station===cs[0]&&d>from&&d<=to)o.ent+=Number(x.quantity)||0});
- o.sor=0;allDist().forEach(function(x){var d=tdate(x.distributed_at);if(x.site===cs[0]&&d>from&&d<=to)o.sor+=Number(x.quantity)||0});
- o.ok=!o.miss.length;o.th=o.s0+o.ent-o.sor;o.ec=o.s1-o.th;o.i0=infoAt(cs[0],from);o.i1=infoAt(cs[0],to);return o}
+  if(a){o.s0+=Number(a.final_volume);ga.push(tdate(a.measured_at));o.cu0.push([tk,Number(a.final_volume)])}else o.miss.push('cuve '+tk+' au début');
+  if(b){o.s1+=Number(b.final_volume);gb.push(tdate(b.measured_at));o.cu1.push([tk,Number(b.final_volume)])}else o.miss.push('cuve '+tk+' à la fin')});
+ o.ok=false;
+ if(!o.miss.length){o.gs=Math.max.apply(null,ga);o.ge=Math.max.apply(null,gb);if(o.ge>o.gs)o.ok=true;else o.same=true}
+ if(o.ok){o.entM=sumE(cs[0],o.gs,o.ge);o.sorM=sumS(cs[0],o.gs,o.ge);o.th=o.s0+o.entM-o.sorM;o.ec=o.s1-o.th}
+ else{o.entM=sumE(cs[0],from.getTime(),to.getTime());o.sorM=sumS(cs[0],from.getTime(),to.getTime())}
+ o.i0=infoAt(cs[0],from.getTime());o.i1=infoAt(cs[0],to.getTime());o.iok=!!(o.i0&&o.i1&&o.i1.t>o.i0.t);
+ if(o.iok){o.entI=sumE(cs[0],o.i0.t,o.i1.t);o.sorI=sumS(cs[0],o.i0.t,o.i1.t);o.thi=o.i0.v+o.entI-o.sorI;o.eci=o.i1.v-o.thi}
+ else{o.entI=o.entM;o.sorI=o.sorM}
+ return o}
 function ecTxt(v,base){var c=v>=0?'#1a7f37':'#c62828',s=(v>=0?'+':'−')+f(Math.abs(v),1,' L'),p=base>0?' ('+(v>=0?'+':'−')+f(Math.abs(v)/base*100,2,' %')+')':'';return'<b style="color:'+c+'">'+s+'</b> '+(v>=0?'gain':'perte')+p}
-function ctRow(a,b,cls){return'<tr'+(cls?' class="'+cls+'"':'')+'><td>'+a+'</td><td>'+b+'</td></tr>'}
+function ecS(v){if(v===null||v===undefined||isNaN(v))return'–';if(Math.abs(v)<1)return'<b style="color:#1a7f37">0 L</b>';var c=v>=0?'#1a7f37':'#c62828';return'<b style="color:'+c+'">'+(v>=0?'+':'−')+f(Math.abs(v),1,' L')+'</b>'}
+function cell(v,sm){return(v===null||v===undefined||isNaN(v))?'–':f(v,1,' L')+(sm?'<small>'+sm+'</small>':'')}
+function cuTxt(a){return a&&a.length?a.map(function(c){return'Cuve '+c[0]+' : '+f(c[1],1,' L')}).join('<br>'):''}
+function cmpCard(title,sub,o,warn,tot){
+ var h='<div class="card"><h2>'+title+(sub?' <small style="color:var(--mut);font-weight:400">('+sub+')</small>':'')+'</h2>';
+ if(warn&&warn.length)h+='<p class="msg er">Jaugeage manquant : '+warn.join(', ')+'.</p>';
+ if(o.same)h+='<p class="msg er">Le même jaugeage sert au début et à la fin : il faut deux jaugeages différents.</p>';
+ h+='<div class="ctb"><div>Écart jaugeage manuel : '+(o.ok?ecTxt(o.ec,o.sorM):'<span class="msg">non calculable</span>')+'</div>';
+ h+='<div>Écart stock informatique : '+(o.iok?ecTxt(o.eci,o.sorI):'<span class="msg">'+(o.i1?'disponible dès le 2e import':'aucun import')+'</span>')+'</div>';
+ if(!tot&&o.ok&&o.i1&&Math.abs(o.ge-o.i1.t)<=2*86400000)h+='<div>Jaugeage manuel − informatique : '+(Math.abs(o.s1-o.i1.v)<1?'<b style="color:#1a7f37">aucune différence</b>':'<b style="color:#c62828">'+(o.s1-o.i1.v>=0?'+':'−')+f(Math.abs(o.s1-o.i1.v),1,' L')+'</b>')+'<small style="display:block;color:var(--mut)">jaugeage du '+fm(o.ge)+' · import du '+fm(o.i1.t)+'</small></div>';
+ h+='</div><table class="ctt"><tr class="ctth"><td></td><td>Jaugeage manuel</td><td>Stock informatique</td></tr>';
+ function row(a,m,i,cls){h+='<tr'+(cls?' class="'+cls+'"':'')+'><td>'+a+'</td><td>'+m+'</td><td>'+i+'</td></tr>'}
+ if(!tot)row('Période utilisée',o.ok?'<small>'+fm(o.gs)+'<br>→ '+fm(o.ge)+'</small>':'<small>période choisie</small>',o.iok?'<small>'+fm(o.i0.t)+'<br>→ '+fm(o.i1.t)+'</small>':'<small>période choisie</small>');
+ row('Stock au début',o.ok?cell(o.s0):'–',o.iok?cell(o.i0.v):(o.i0?cell(o.i0.v):'–'));
+ row('+ Entrées de stock',f(o.entM,1,' L'),f(o.entI,1,' L'));
+ row('− Sorties (distributions)',f(o.sorM,1,' L'),f(o.sorI,1,' L'));
+ row('= Stock théorique',o.ok?cell(o.th):'–',o.iok?cell(o.thi):'–','tt');
+ row('Stock à la fin (litrage des cuves)',o.ok?cell(o.s1,tot?'':cuTxt(o.cu1)):'–',o.i1?cell(o.i1.v,tot?'':cuTxt(o.i1.cu)):'aucun import');
+ row('Écart (fin − théorique)',o.ok?ecS(o.ec):'–',o.iok?ecS(o.eci):'–','tt');
+ return h+'</table></div>'}
 function ctlRender(){var m=$('ctout'),from=new Date($('ctfrom').value),to=new Date($('ctto').value);
  if(isNaN(from)||isNaN(to)||to<=from){m.innerHTML='<p class="msg er">Choisissez une période valide (début avant fin).</p>';return}
- var tot={s0:0,s1:0,ent:0,sor:0,ok:true},h='';
- CS.forEach(function(cs){var o=ctSite(cs,from,to);
-  h+='<div class="card"><h2>'+cs[1]+' <small style="color:var(--mut);font-weight:400">('+cs[2]+')</small></h2>';
-  if(o.miss.length)h+='<p class="msg er">Jaugeage manquant : '+o.miss.join(', ')+'.</p>';
-  h+='<table class="ctt">';
-  if(o.ok)h+=ctRow('Stock mesuré au début'+(o.d0.length?'<small>'+rngDates(o.d0)+'</small>':''),f(o.s0,1,' L'))+ctRow('+ Entrées de stock',f(o.ent,1,' L'))+ctRow('− Sorties (distributions)',f(o.sor,1,' L'))+ctRow('= Stock théorique',f(o.th,1,' L'),'tt')+ctRow('Stock mesuré à la fin'+(o.d1.length?'<small>'+rngDates(o.d1)+'</small>':''),f(o.s1,1,' L'))+ctRow('Écart (mesuré − théorique)',ecTxt(o.ec,o.sor),'tt');
-  else h+=ctRow('Entrées de stock',f(o.ent,1,' L'))+ctRow('Sorties (distributions)',f(o.sor,1,' L'));
-  h+=ctRow('Stock informatique au début'+(o.i0?'<small>'+o.i0.d+'</small>':''),o.i0?f(o.i0.v,1,' L'):'non importé')+ctRow('Stock informatique à la fin'+(o.i1?'<small>'+o.i1.d+'</small>':''),o.i1?f(o.i1.v,1,' L'):'non importé');
-  if(o.i0&&o.i1&&o.i0.d!==o.i1.d)h+=ctRow('Écart informatique (variation − entrées + sorties)',ecTxt((o.i1.v-o.i0.v)-(o.ent-o.sor),o.sor),'tt');
-  if(o.i1&&o.ok)h+=ctRow('Écart (jaugeage manuel − informatique)',ecTxt(o.s1-o.i1.v,0).replace(/ \(.*$/,''),'tt');
-  h+='</table></div>';
-  if(o.ok){tot.s0+=o.s0;tot.s1+=o.s1;tot.ent+=o.ent;tot.sor+=o.sor}else tot.ok=false});
- if(tot.ok){var th=tot.s0+tot.ent-tot.sor,ec=tot.s1-th;h='<div class="card"><h2>Total Glacière + Feu vert</h2><table class="ctt">'+ctRow('Stock mesuré au début',f(tot.s0,1,' L'))+ctRow('+ Entrées de stock',f(tot.ent,1,' L'))+ctRow('− Sorties (distributions)',f(tot.sor,1,' L'))+ctRow('= Stock théorique',f(th,1,' L'),'tt')+ctRow('Stock mesuré à la fin',f(tot.s1,1,' L'))+ctRow('Écart (mesuré − théorique)',ecTxt(ec,tot.sor),'tt')+'</table></div>'+h}
- m.innerHTML=h}
+ var h='',os=[];
+ CS.forEach(function(cs){var o=ctSite(cs,from,to);os.push(o);h+=cmpCard(cs[1],cs[2],o,o.miss)});
+ var T={ok:os.every(function(o){return o.ok}),iok:os.every(function(o){return o.iok}),s0:0,s1:0,entM:0,sorM:0,entI:0,sorI:0,i0:{v:0},i1:{v:0,cu:[]},th:0,thi:0};
+ os.forEach(function(o){T.s0+=o.s0;T.s1+=o.s1;T.entM+=o.entM;T.sorM+=o.sorM;T.entI+=o.entI;T.sorI+=o.sorI;if(o.i0)T.i0.v+=o.i0.v;if(o.i1)T.i1.v+=o.i1.v;if(o.ok){T.th+=o.th}if(o.iok){T.thi+=o.thi}});
+ T.ec=T.s1-T.th;T.eci=T.i1.v-T.thi;if(!os.every(function(o){return o.i1}))T.i1=null;if(!os.every(function(o){return o.i0}))T.i0=null;
+ m.innerHTML=cmpCard('Total Glacière + Feu vert','',T,[],true)+h}
+function snapTimes(){var s={};(L.irecs||[]).forEach(function(r){var d=tdate(r.recorded_at);if(!isNaN(d))s[d]=1});return Object.keys(s).map(Number).sort(function(a,b){return a-b})}
+function toInp(t){var d=new Date(Math.ceil(t/60000)*60000);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
+function lastControl(){var s=snapTimes();if(s.length<2)return false;L.ctfrom=toInp(s[s.length-2]);L.ctto=toInp(s[s.length-1]);$('ctfrom').value=L.ctfrom;$('ctto').value=L.ctto;save();return true}
 function ctlInit(){var d=new Date();if(!L.ctto)L.ctto=nowLocal();if(!L.ctfrom){var f1=new Date(d.getFullYear(),d.getMonth(),1);f1.setMinutes(f1.getMinutes()-f1.getTimezoneOffset());L.ctfrom=f1.toISOString().slice(0,16)}
  $('ctfrom').value=L.ctfrom;$('ctto').value=L.ctto;$('ciw').textContent=L.inot?'Stock informatique indisponible : SQL « partie 8 » à lancer dans Supabase.':'';ctlRender()}
 $('ctfrom').onchange=function(){L.ctfrom=this.value;save();ctlRender()};
 $('ctto').onchange=function(){L.ctto=this.value;save();ctlRender()};
+$('ctlast').onclick=function(){if(!lastControl()){$('ciw').textContent='Il faut au moins 2 imports de stock informatique.';return}$('ciw').textContent='';ctlRender()};
 $('ctnow').onclick=function(){L.ctto=nowLocal();$('ctto').value=L.ctto;save();ctlRender()};
 function ciAnalyse(text){var rows=csvParse(text),res={ok:[],err:[],already:0,skip:0,snap:null};
  if(!rows.length){res.fatal='Fichier vide.';return res}
@@ -720,11 +744,10 @@ function ciAnalyse(text){var rows=csvParse(text),res={ok:[],err:[],already:0,ski
   if(cC>=0){tk=String(r[cC]||'').trim()||null;if(!st){var mm=String(tk||'').match(/^\d$/);if(mm)st=tk<='3'?'FV':'GL'}}
   if(!st){res.err.push('Ligne '+ln+' : site inconnu « '+String((cS>=0?r[cS]:r[cC])||'').trim()+' »');continue}
   v=parseQty(r[cQ]);if(!isFinite(v)){res.err.push('Ligne '+ln+' : stock invalide « '+String(r[cQ]||'').trim()+' »');continue}
-  if(cD>=0){dtp=parseDT(r[cD],cT>=0?r[cT]:'');if(!dtp){res.err.push('Ligne '+ln+' : date invalide « '+String(r[cD]||'').trim()+' »');continue}if(!snap||dtp.dt>snap)snap=dtp.dt}
   kept.push({st:st,tk:tk,v:v})}
- if(!snap)snap=nowLocal();res.snap=snap;
+ snap=new Date().toISOString();res.snap=snap;
  kept.forEach(function(x){var key='si|'+x.st+'|'+(x.tk||'_')+'|'+snap+'|'+x.v;if(seen[key]){res.already++;return}seen[key]=1;if(have[key]){res.already++;return}
-  res.ok.push({client_id:key,site:x.st,tank:x.tk,quantity:x.v,recorded_at:new Date(snap).toISOString(),source:'csv'})});
+  res.ok.push({client_id:key,site:x.st,tank:x.tk,quantity:x.v,recorded_at:snap,source:'csv'})});
  return res}
 async function ciRun(res){var m=$('cires');
  if(res.fatal){m.innerHTML='<p class="msg er">'+esc(res.fatal)+'</p>';return}
@@ -734,8 +757,8 @@ async function ciRun(res){var m=$('cires');
  try{for(var i=0;i<res.ok.length;i+=200){var r=await req('POST','/rest/v1/stock_info?on_conflict=client_id',res.ok.slice(i,i+200),{Prefer:'resolution=ignore-duplicates,return=minimal'});
    if(r.status===404){m.innerHTML='<p class="msg er">Table absente : lancez le SQL « partie 8 » dans Supabase.</p>';return}
    if(!r.ok){m.innerHTML='<p class="msg er">Import refusé ('+r.status+').</p>'+h;return}}
-  m.innerHTML='<p class="msg ok">'+res.ok.length+' ligne(s) de stock importée(s) · stock du '+new Date(res.snap).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})+(res.already?' ('+res.already+' déjà présente(s))':'')+'.</p>'+h;
-  L.ilast=0;await sync();ctlRender()}catch(e){m.innerHTML='<p class="msg er">Réseau indisponible : réessayez.</p>'}}
+  m.innerHTML='<p class="msg ok">'+res.ok.length+' ligne(s) de stock importée(s) · import du '+new Date(res.snap).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})+(res.already?' ('+res.already+' déjà présente(s))':'')+'.</p>'+h;
+  L.ilast=0;await sync();lastControl();ctlRender()}catch(e){m.innerHTML='<p class="msg er">Réseau indisponible : réessayez.</p>'}}
 $('cifile').onchange=function(e){var fl=e.target.files[0],inp=e.target;if(!fl)return;$('cires').innerHTML='<p class="msg">Lecture…</p>';
  var rd=new FileReader();rd.onload=function(){inp.value='';ciRun(ciAnalyse(decodeCsv(rd.result)))};rd.onerror=function(){$('cires').innerHTML='<p class="msg er">Lecture du fichier impossible.</p>'};rd.readAsArrayBuffer(fl)};
 opts($('tank'),false,true);opts($('at'));opts($('ft'),true,true);$('dt').value=nowLocal();upd();
